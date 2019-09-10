@@ -8,11 +8,30 @@ class User {
   User({@required this.uid});
   final String uid;
 }
-
-abstract class AuthBase {
-  Future<User> currentUser();
-  Future<User> signInAnonymously();
-  Future<void> signOut();
+// These are the instructions from the application logic controller
+// for the screens to update their state.
+// In the app currently only the landing page is stateful.
+abstract class UICommandsIntf {
+  void updateUser(User user);
+  void error(dynamic e);
+}
+// These are the events coming from the screens.
+// It's the job of the application controller to act accordingly,
+// and as response, sends instructions to the UI what to do.
+abstract class UIEventsIntf {
+  void registerScreen(UICommandsIntf screen);
+  Future<void> onSignOut();
+  Future<void> onSignInAnonymously();
+  Future<void> onCheckCurrentUser();
+}
+//This is going to be promoted as application logic component interface
+//to handle events from UI/screens
+abstract class AuthBase implements UIEventsIntf {
+  // These functions are not the concern of the UI any more, 
+  // these are used only by the application logic component, which is Auth in this sample app. 
+  // Future<User> currentUser();
+  // Future<User> signInAnonymously();
+  // Future<void> signOut();
 }
 
 class Auth implements AuthBase {
@@ -35,7 +54,38 @@ class Auth implements AuthBase {
   Future<void> signOut() async {
     return await _firebaseAuth.signOut();
   }
+  @override Future<void> onCheckCurrentUser() async {
+    User user = await currentUser();
+    screen?.updateUser(user);
+  }
+  //The user clicked a button/menu to sign in without defining user name
+  @override Future<void> onSignInAnonymously() async {
+    try {
+      User user = await signInAnonymously();
+      screen?.updateUser(user);
+    } catch (e) {
+      screen?.error(e);
+    }
+  }
+  //The user clicked a button/menu to sign out
+  @override Future<void> onSignOut() async {
+    try {
+      await signOut();
+      screen?.updateUser(null);
+    } catch (e) {
+      screen?.error(e);
+    }
+  }
+  UICommandsIntf _screen;
+  UICommandsIntf get screen {
+    if(_screen == null) throw "No screen registered";
+    else return _screen;
+  }
+  @override void registerScreen(UICommandsIntf screen) {
+    _screen = screen;
+  }
 }
+
 class FirebaseUser {
   final String uid;
   FirebaseUser(this.uid);

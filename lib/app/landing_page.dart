@@ -11,39 +11,43 @@ class LandingPage extends StatefulWidget {
   @override
   _LandingPageState createState() => _LandingPageState();
 }
-
-class _LandingPageState extends State<LandingPage> {
+// Stateful widgets should implement UICommands directly or via mixins
+// The application logic component (auth in this example) sends instructions to the UI what to do
+class _LandingPageState extends State<LandingPage>  implements UICommandsIntf {
 
   User _user;
 
   @override
   void initState() {
     super.initState();
-    _checkCurrentUser();
+    // It is very important to register a stateful widget as 
+    // the recipient of instructions from the application logic components    
+    widget.auth.registerScreen(this);
+    widget.auth.onCheckCurrentUser();
   }
-
-  Future<void> _checkCurrentUser() async {
-    User user = await widget.auth.currentUser();
-    _updateUser(user);
-  }
-
-  void _updateUser(User user) {
+  // A command from the application logic component to update the state
+  @override
+  void updateUser(User user) {
     setState(() {
       _user = user;
     });
   }
-
+  // An error occured during some operations, please, inform the user
+  @override
+  void error(e) {
+      print(e.toString());
+  }
+  // The application logic controller is passed along to all pages and screens,
+  // but it's not necessary, since a static global singleton could be used, too.
   @override
   Widget build(BuildContext context) {
     if (_user == null) {
       return SignInPage(
         auth: widget.auth,
-        onSignIn: _updateUser,
       );
     }
     return HomePage(
       auth: widget.auth,
-      onSignOut: () => _updateUser(null),
     );
   }
 }
