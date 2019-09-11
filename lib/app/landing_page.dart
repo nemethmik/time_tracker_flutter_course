@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:time_tracker_flutter_course/app/home_page.dart';
 import 'package:time_tracker_flutter_course/app/sign_in/sign_in_page.dart';
@@ -13,41 +11,56 @@ class LandingPage extends StatefulWidget {
 }
 // Stateful widgets should implement UICommands directly or via mixins
 // The application logic component (auth in this example) sends instructions to the UI what to do
-class _LandingPageState extends State<LandingPage>  implements UICommandsIntf {
+class _LandingPageState extends State<LandingPage>/*  implements UICommandsIntf*/ {
 
-  User _user;
-
+  // User _user;
+  @override void dispose() {
+    super.dispose();
+  }
   @override
   void initState() {
     super.initState();
     // It is very important to register a stateful widget as 
     // the recipient of instructions from the application logic components    
-    widget.auth.registerScreen(this);
+    // widget.auth.registerScreen(this);
     widget.auth.onCheckCurrentUser();
   }
   // A command from the application logic component to update the state
-  @override
-  void updateUser(User user) {
-    setState(() {
-      _user = user;
-    });
-  }
+  // @override
+  // void updateUser(User user) {
+  //   setState(() {
+  //     _user = user;
+  //   });
+  // }
   // An error occured during some operations, please, inform the user
-  @override
-  void error(e) {
-      print(e.toString());
-  }
+  // @override
+  // void error(e) {
+  //     print(e.toString());
+  // }
   // The application logic controller is passed along to all pages and screens,
   // but it's not necessary, since a static global singleton could be used, too.
   @override
   Widget build(BuildContext context) {
-    if (_user == null) {
-      return SignInPage(
-        auth: widget.auth,
-      );
-    }
-    return HomePage(
-      auth: widget.auth,
+    return StreamBuilder<User>(
+      stream: widget.auth.onAuthStateChanged,
+      builder: (context,snapshot){
+        if(snapshot.connectionState == ConnectionState.active) {
+          if (snapshot.data == null) {
+            return SignInPage(
+              auth: widget.auth,
+            );
+          }
+          return HomePage(
+            auth: widget.auth,
+          );
+        } else {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+      },
     );
   }
 }
