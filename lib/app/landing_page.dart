@@ -16,6 +16,7 @@ class _LandingPageState extends State<LandingPage>/*  implements UICommandsIntf*
   // User _user;
   @override void dispose() {
     super.dispose();
+    widget.auth.dispose();
   }
   @override
   void initState() {
@@ -44,21 +45,24 @@ class _LandingPageState extends State<LandingPage>/*  implements UICommandsIntf*
     return StreamBuilder<User>(
       stream: widget.auth.onAuthStateChanged,
       builder: (context,snapshot){
+        var progressIndicator = Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
         if(snapshot.connectionState == ConnectionState.active) {
           if (snapshot.data == null) {
-            return SignInPage(
-              auth: widget.auth,
-            );
+            return SignInPage(auth: widget.auth,);
+          } else {
+            // Authentication or logout process has been started
+            if(snapshot.data.uid == null) {
+              return progressIndicator;  
+            } else {
+              return HomePage(auth: widget.auth,);
+            }
           }
-          return HomePage(
-            auth: widget.auth,
-          );
         } else {
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return progressIndicator;
         }
       },
     );

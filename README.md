@@ -22,6 +22,14 @@ So, with my example I just wanted to demonstrate that **reactive architecture is
 
 An [accompanying video](https://youtu.be/fpwh9eGqtBk) explains all these in detail.
 
+## 0911 Auth Stream Branch
+
+In this version the communication from the application logic controller towards the UI was changed over to a stream. This example is not really clean since the event streams shoud be clearly differentiated from data streams, just like in Android Architecture with Live Data. So, with the introduction of streams, practically my AL component became exactly the same as a BloC.
+
+In this architecture the UI sends evants via function calls, which is perfectly fine, since that direction of dependency is totally OK, the UI is allowed to know the exact interface of the AL. I don't see any benefit of defining a stream to send event messages from the UI to AL. It would be absolutely possible, and it would be totally OK, too. On the other hand, using streams to send data as well as instructions to UI is perfectly fine. 
+
+The accompanying video is [Flutter 92 Time Tracker with Application Layer Applying Auth Stream](https://youtu.be/Bimbj2EHlA8)
+
 # Fake FirebaseAuth Implementation
 Since I have zero interest in Firebase, I removed all Firebase references from the project reversing the configuration explained in [lecture 119](https://www.udemy.com/course/flutter-firebase-build-a-complete-app-for-ios-android/learn/lecture/13910906).
 
@@ -44,4 +52,4 @@ class FirebaseAuth {
 Note that I simulate lengthy operation by adding 1 second delay to each method.
 
 # Using Tags with Visual Studio
-Instead of branches Andrea used tags in his repository.
+Instead of branches Andrea used tags in his repository. VSC supports tags excellently, too, but I didn't see any benefit of tags vs branches, so I continue using branches.

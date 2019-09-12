@@ -3,9 +3,9 @@ import 'dart:async';
 //import 'package:firebase_auth/firebase_auth.dart';
 //import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
-
+// When user id is null it is a sign that the signout or signin process has started
 class User {
-  User({@required this.uid});
+  User({/*@required*/ this.uid});
   final String uid;
 }
 // These are the instructions from the application logic controller
@@ -105,16 +105,20 @@ class FirebaseUser {
 class FirebaseAuth {
   static FirebaseAuth instance = FirebaseAuth();
   FirebaseUser signInUser;
-  Future<FirebaseUser> signInAnonymously() => Future<FirebaseUser>.delayed(Duration(seconds: 1),() { 
+  Future<FirebaseUser> signInAnonymously() {
+    controller.add(FirebaseUser(null)); // To indicate that the sign in process has been started
+    return Future<FirebaseUser>.delayed(Duration(seconds: 2),() { 
       signInUser = FirebaseUser("1234-5678-6789"); 
-      controller.sink.add(signInUser);
+      controller.add(signInUser);
       return signInUser;
-    });
+    });}
   Future<FirebaseUser> currentUser() => Future<FirebaseUser>.delayed(Duration(seconds: 1),() => signInUser);
-  Future<void> signOut() => Future<void>.delayed(Duration(seconds: 1),(){
+  Future<void> signOut() {
+    controller.add(FirebaseUser(null)); // To indicate that signout process has started
+    return Future<void>.delayed(Duration(seconds: 1),(){
       signInUser = null;
       controller.sink.add(signInUser);
-    });
+    });}
   StreamController<FirebaseUser> controller = StreamController.broadcast();
   FirebaseAuth() {
     signOut();
