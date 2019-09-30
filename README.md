@@ -16,7 +16,7 @@ When you have an application logic controller, it becomes responsible for all bu
 
 ### What is then the major difference between set-state driven and stream driven architectures?
 As explained above, with clean separation of concerns, nice application architectures can be made with simple tools like set-states and stateful widgets, too. 
-This solution as I demonstrated here is a **reactive** approach, too; when the state class of the landing page's stateful widget was registered itself on the application logic controller, actually it became a listener. However, streams are a lot more versatile for this kind of reactive programming. So, the natural next step from this application logic controller solution presented here is using streams for communications, and stream builders to react "application logic instructions".
+This solution as I demonstrated here is a **reactive** approach, too; when the state class of the landing page's stateful widget registered itself on the application logic controller, actually it became a listener. However, streams are a lot more versatile for this kind of reactive programming. So, the natural next step from this application logic controller solution presented here is using streams for communications, and stream builders to react "application logic instructions".
 This is a fundamental part of MVVM architectures, where UI objects are listening to view-model objects. This MVVM architecture was brilliantly elaborated in Xamarin Forms, Android Architecture Components with Live Data, Data Binding and View Models, too. The Change Notifier machinery of the Flutter provider package is not based on streams but follows this reactive pattern, either.
 So, with my example I just wanted to demonstrate that **reactive architecture is absolutely possible with simple tools like set-state and stateful widgets**.
 
@@ -26,7 +26,7 @@ An [accompanying video](https://youtu.be/fpwh9eGqtBk) explains all these in deta
 
 In this version the communication from the application logic controller towards the UI was changed over to a stream. This example is not really clean since the event streams shoud be clearly differentiated from data streams, just like in Android Architecture with Live Data. So, with the introduction of streams, practically my AL component became exactly the same as a BloC.
 
-In this architecture the UI sends evants via function calls, which is perfectly fine, since that direction of dependency is totally OK, the UI is allowed to know the exact interface of the AL. I don't see any benefit of defining a stream to send event messages from the UI to AL. It would be absolutely possible, and it would be totally OK, too. On the other hand, using streams to send data as well as instructions to UI is perfectly fine. 
+In this architecture the UI sends events to AL via function calls, which is perfectly fine, since that direction of dependency is totally OK: the UI is allowed to know the exact interface of the AL. I don't see any benefit of defining a stream to send event messages from the UI to AL. 
 
 The accompanying video is [Flutter 92 Time Tracker with Application Layer Applying Auth Stream](https://youtu.be/Bimbj2EHlA8)
 
